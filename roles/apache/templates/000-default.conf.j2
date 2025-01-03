@@ -1,0 +1,22 @@
+# This file deployed by ansible. Do not edit.
+<VirtualHost *:80>
+	ServerName {{ http_server_name }}
+	ServerAlias {{ http_server_alias }}
+        ServerAdmin {{ http_server_admin }}
+        DocumentRoot /var/www/html
+
+	RewriteEngine On
+	RewriteCond %{REQUEST_URI} !^/\.well\-known/acme\-challenge/
+	RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [R=301]
+
+	# Redirect non-local letsencrypt ACME interaction to next probable server
+	RewriteCond %{REQUEST_URI} !^/\.well\-known/acme\-challenge/
+	RewriteCond %{DOCUMENT_ROOT}/%{REQUEST_FILENAME} !-f
+	RewriteCond %{HTTP_HOST} {{ http_server_alias }}
+	RewriteRule ^/(.*)$ http://{{ http_acme_nexthop }}%{REQUEST_URI} [P,QSA]
+
+        ErrorLog ${APACHE_LOG_DIR}/error.log
+        CustomLog ${APACHE_LOG_DIR}/access.log common_anon
+	LogFormat "XXX %l %u %t \"%r\" %>s %b" common_anon
+</VirtualHost>
+	

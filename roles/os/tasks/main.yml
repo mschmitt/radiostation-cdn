@@ -1,0 +1,98 @@
+- name: Timezone
+  command: timedatectl set-timezone Europe/Berlin
+- name: apt update
+  command: apt-get -y update
+- name: apt remove packages
+  package:
+    name:
+      - rpcbind
+    state: absent
+- name: apt install packages
+  package:
+    name: 
+      - apache2
+      - icecast2
+      - socat
+      - prometheus
+      - ntpsec
+      - git
+      - golang-go
+      - vim-nox
+      - bash-completion
+      - man-db
+      - python-is-python3
+- name: Clone prometheus icecast exporter
+  git:
+    repo: https://github.com/ethrgeist/icecast_exporter
+    dest: /usr/local/src/icecast_exporter
+- name: Build and install prometheus icecast exporter
+  shell: |
+    cd /usr/local/src/icecast_exporter
+    go build
+- name: Deploy icecast exporter service
+  copy:
+    src: prometheus_icecast_exporter.service
+    dest: /etc/systemd/system
+    mode: 0444
+- name: Enable and start icecast exporter service
+  systemd:
+    name: prometheus_icecast_exporter
+    state: restarted
+    enabled: true
+- name: Bind prometheus node exporter to localhost
+  copy:
+    src: prometheus-node-exporter
+    dest: /etc/default/prometheus-node-exporter
+    mode: 0444
+- name: Restart prometheus node exporter
+  systemd:
+    name: prometheus-node-exporter
+    state: restarted
+    enabled: true
+- name: drop-in service.d
+  file:
+    path: /etc/systemd/system/prometheus.service.d/
+    state: directory
+- name: Deploy prometheus acl
+  template:
+    src: prometheus-acl.conf.j2
+    dest: /etc/systemd/system/prometheus.service.d/prometheus-acl.conf
+    mode: 0444
+- name: Bind prometheus to localhost
+  copy:
+    src: prometheus
+    dest: /etc/default/prometheus
+    mode: 0444
+- name: Deploy prometheus.yml
+  template:
+    src: prometheus.yml.j2
+    dest: /etc/prometheus/prometheus.yml
+    mode: 0444
+- name: Restart prometheus
+  systemd:
+    name: prometheus
+    state: restarted
+    enabled: true
+- name: Disable firewall
+  systemd:
+    name: netfilter-persistent
+    state: stopped
+    enabled: false
+- name: Enable and start icecast
+  systemd:
+    name: icecast2
+    state: started
+    enabled: true
+- name: Deploy icecast relayproxy
+  template:
+    src: icecast-relayproxy.service.j2
+    dest: /etc/systemd/system/icecast-relayproxy.service
+    mode: 0444
+- name: Enable and start icecast-relayproxy
+  systemd:
+    name: icecast-relayproxy
+    state: started
+    enabled: true
+    daemon_reload: true
+
+# vim: filetype=yaml

@@ -1,0 +1,30 @@
+- name: Replicate nulldevice in /var/log/icecast2
+  shell: |
+    mknod /var/log/icecast2/null --mode=0666 c 1 3 || true
+- name: icecast.xml
+  template:
+    src: icecast.xml.j2
+    dest: /etc/icecast2/icecast.xml
+    owner: root
+    group: icecast
+    mode: 0440
+- name: drop-in service.d
+  file:
+    path: /etc/systemd/system/icecast2.service.d/
+    state: directory
+- name: certstealer
+  template:
+    src: certsteal.conf.j2
+    dest: /etc/systemd/system/icecast2.service.d/certsteal.conf
+    mode: 0444
+- name: Test if icecast configuration looks complete
+  stat:
+    path: /etc/icecast2/apache-md-certificate.pem
+  register: certpem
+- name: icecast restart
+  systemd_service:
+    name: icecast2
+    daemon_reload: true
+    state: restarted
+  when: not certpem.stat.exists
+# vim: filetype=yaml

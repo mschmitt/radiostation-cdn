@@ -1,0 +1,29 @@
+# This file deployed by ansible. Do not edit.
+MDomain {{ http_server_name }} {{ http_server_alias }}
+MDStapling on
+MDCertificateAgreement accepted
+MDContactEmail {{ http_mdomain_contact_email }}
+<VirtualHost *:443>
+	ServerName {{ http_server_name }}
+	ServerAlias {{ http_server_alias }}
+        ServerAdmin {{ http_server_admin }}
+        DocumentRoot /var/www/html
+
+	# Redirect non-local letsencrypt ACME interaction to next probable server
+	RewriteCond %{REQUEST_URI} !^/\.well\-known/acme\-challenge/
+	RewriteCond %{DOCUMENT_ROOT}/%{REQUEST_FILENAME} !-f
+	RewriteCond %{HTTP_HOST} {{ http_server_alias }}
+	RewriteRule ^/(.*)$ https://{{ http_acme_nexthop }}%{REQUEST_URI} [P,QSA]
+
+        SSLEngine on
+	SSLCipherSuite -ALL:kEECDH+SHA256:kEECDH+SHA384:kEECDH+AESGCM:-CAMELLIA:!NULL:@STRENGTH
+	SSLProtocol TLSv1.2
+
+	SSLProxyEngine on
+	ProxyPass / {{ http_proxy_to }}/
+	ProxyPassReverse / {{ http_proxy_to }}/
+
+        ErrorLog ${APACHE_LOG_DIR}/error.log
+        CustomLog ${APACHE_LOG_DIR}/access.log common_anon
+	LogFormat "XXX %l %u %t \"%r\" %>s %b" common_anon
+</VirtualHost>

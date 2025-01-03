@@ -1,0 +1,20 @@
+- name: Apache configuration
+  template:
+    src: 000-default.conf.j2
+    dest: /etc/apache2/sites-available/000-default.conf
+- name: Apache ssl configuration
+  template:
+    src: default-ssl.conf.j2
+    dest: /etc/apache2/sites-available/default-ssl.conf
+- name: Enable all the things
+  shell: |
+    a2enmod ssl || true
+    a2enmod md || true
+    a2enmod proxy || true
+    a2enmod proxy_http || true
+    a2enmod headers || true
+    a2enmod rewrite || true
+    a2ensite default-ssl || true
+    systemctl stop apache2 || true
+    systemctl start apache2
+# vim: filetype=yaml

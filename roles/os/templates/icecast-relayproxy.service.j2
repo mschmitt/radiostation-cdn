@@ -1,0 +1,11 @@
+# This file deployed by ansible. Do not edit.
+[Unit]
+Description="SSL proxy to upstream icecast relay"
+Before=icecast.service
+
+[Service]
+User=icecast2
+ExecStart=socat TCP-LISTEN:9443,fork,bind=localhost OPENSSL:{{ icecast_master_server }}:{{ icecast_master_port }},capath=/etc/ssl/certs/
+
+[Install]
+WantedBy=multi-user.target

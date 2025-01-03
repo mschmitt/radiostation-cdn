@@ -1,0 +1,12 @@
+# This file deployed by ansible. Do not edit.
+[Unit]
+Description=Prometheus Exporter for Icecast
+
+[Service]
+ExecStart=/usr/local/src/icecast_exporter/icecast_exporter -web.listen-address '[::1]:9146'
+User=daemon
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

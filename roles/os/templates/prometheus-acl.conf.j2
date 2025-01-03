@@ -1,0 +1,10 @@
+# This file deployed by ansible. Do not edit.
+[Service]
+ExecStartPre=+iptables -A INPUT -s {{ grafana4 }} -j ACCEPT
+ExecStartPre=+ip6tables -A INPUT -s {{ grafana6 }} -j ACCEPT
+ExecStartPre=+iptables -A INPUT -m state --state NEW -p tcp -m tcp --dport 9090 -j DROP
+ExecStartPre=+ip6tables -A INPUT -m state --state NEW -p tcp -m tcp --dport 9090 -j DROP
+ExecStopPost=+iptables -D INPUT -s {{ grafana4 }} -j ACCEPT
+ExecStopPost=+ip6tables -D INPUT -s {{ grafana6 }} -j ACCEPT
+ExecStopPost=+iptables -D INPUT -m state --state NEW -p tcp -m tcp --dport 9090 -j DROP
+ExecStopPost=+ip6tables -D INPUT -m state --state NEW -p tcp -m tcp --dport 9090 -j DROP
