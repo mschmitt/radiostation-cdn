@@ -10,7 +10,9 @@ MDContactEmail {{ http_mdomain_contact_email }}
         DocumentRoot /var/www/html
 
 	# Redirect non-local letsencrypt ACME interaction to next probable server
-	RewriteCond %{REQUEST_URI} !^/\.well\-known/acme\-challenge/
+	RewriteEngine On
+	#LogLevel warn rewrite:trace8
+	RewriteCond %{REQUEST_URI} ^/.well-known/acme-challenge/
 	RewriteCond %{DOCUMENT_ROOT}/%{REQUEST_FILENAME} !-f
 	RewriteCond %{HTTP_HOST} {{ http_server_alias }}
 	RewriteRule ^/(.*)$ https://{{ http_acme_nexthop }}%{REQUEST_URI} [P,QSA]
@@ -20,6 +22,7 @@ MDContactEmail {{ http_mdomain_contact_email }}
 	SSLProtocol TLSv1.2
 
 	SSLProxyEngine on
+	ProxyPass /.well-known/ !
 	ProxyPass / {{ http_proxy_to }}/
 	ProxyPassReverse / {{ http_proxy_to }}/
 

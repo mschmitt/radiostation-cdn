@@ -6,11 +6,13 @@
         DocumentRoot /var/www/html
 
 	RewriteEngine On
-	RewriteCond %{REQUEST_URI} !^/\.well\-known/acme\-challenge/
+	RewriteCond %{REQUEST_URI} !^/.well-known/acme-challenge/
 	RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [R=301]
 
 	# Redirect non-local letsencrypt ACME interaction to next probable server
-	RewriteCond %{REQUEST_URI} !^/\.well\-known/acme\-challenge/
+	#RewriteEngine On (see above)
+	#LogLevel warn rewrite:trace8
+	RewriteCond %{REQUEST_URI} ^/.well-known/acme-challenge/
 	RewriteCond %{DOCUMENT_ROOT}/%{REQUEST_FILENAME} !-f
 	RewriteCond %{HTTP_HOST} {{ http_server_alias }}
 	RewriteRule ^/(.*)$ http://{{ http_acme_nexthop }}%{REQUEST_URI} [P,QSA]
