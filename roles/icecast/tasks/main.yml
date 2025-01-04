@@ -19,7 +19,7 @@
     mode: 0444
 - name: Test if icecast configuration looks complete
   stat:
-    path: /etc/icecast2/apache-md-certificate.pem
+    path: /etc/icecast2/certificate+key.pem
   register: certpem
 - name: icecast restart
   systemd_service:

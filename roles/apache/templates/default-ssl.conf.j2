@@ -1,8 +1,5 @@
 # This file deployed by ansible. Do not edit.
-MDomain {{ http_server_name }} {{ http_server_alias }}
-MDStapling on
-MDCertificateAgreement accepted
-MDContactEmail {{ http_mdomain_contact_email }}
+SSLStaplingCache shmcb:${APACHE_RUN_DIR}/ssl_stapling(32768)
 <VirtualHost *:443>
 	ServerName {{ http_server_name }}
 	ServerAlias {{ http_server_alias }}
@@ -18,8 +15,11 @@ MDContactEmail {{ http_mdomain_contact_email }}
 	RewriteRule ^/(.*)$ https://{{ http_acme_nexthop }}%{REQUEST_URI} [P,QSA]
 
         SSLEngine on
+	SSLCertificateFile /usr/local/etc/acme-tiny/crt.pem
+	SSLCertificateKeyFile /usr/local/etc/acme-tiny/key.pem
 	SSLCipherSuite -ALL:kEECDH+SHA256:kEECDH+SHA384:kEECDH+AESGCM:-CAMELLIA:!NULL:@STRENGTH
-	SSLProtocol TLSv1.2
+	SSLProtocol -all +TLSv1.2 +TLSv1.3
+	SSLUseStapling On
 
 	SSLProxyEngine on
 	ProxyPass /.well-known/ !

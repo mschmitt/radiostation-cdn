@@ -1,5 +1,5 @@
 # This file deployed by ansible. Do not edit.
 [Service]
-ExecStartPre=+install -m 0600 -o icecast2 -g icecast /dev/null /etc/icecast2/apache-md-certificate.pem
-ExecStartPre=-+sh -c 'cat /etc/apache2/md/domains/{{ http_server_name }}/pubcert.pem >> /etc/icecast2/apache-md-certificate.pem'
-ExecStartPre=-+sh -c 'cat /etc/apache2/md/domains/{{ http_server_name }}/privkey.pem >> /etc/icecast2/apache-md-certificate.pem'
+ExecStartPre=+install -m 0600 -o icecast2 -g icecast /dev/null /etc/icecast2/certificate+key.pem
+ExecStartPre=-+sh -c 'cat /usr/local/etc/acme-tiny/crt.pem >> /etc/icecast2/certificate+key.pem'
+ExecStartPre=-+sh -c 'cat /usr/local/etc/acme-tiny/key.pem >> /etc/icecast2/certificate+key.pem'

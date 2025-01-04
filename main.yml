@@ -4,5 +4,6 @@
   gather_facts: true
   roles:
     - os
+    - acme-tiny
     - apache
     - icecast

@@ -1,0 +1,67 @@
+- name: Clone acme-tiny
+  git:
+    repo: https://github.com/diafygi/acme-tiny.git
+    dest: /usr/local/src/acme-tiny
+- name: Create state directory
+  file:
+    path: /usr/local/etc/acme-tiny
+    state: directory
+    owner: root
+    group: www-data
+    mode: 0750
+- name: Test if LE account key exists
+  stat:
+    path: /usr/local/etc/acme-tiny/account.key
+  register: acctkey
+- name: Create LE account key
+  shell: |
+    umask 0027
+    openssl genrsa 4096 > /usr/local/etc/acme-tiny/account.key
+  when: not acctkey.stat.exists
+- name: Test if key exists
+  stat:
+    path: /usr/local/etc/acme-tiny/key.pem
+  register: keypem
+- name: Create key
+  shell: |
+    umask 0027
+    openssl genrsa 4096 > /usr/local/etc/acme-tiny/key.pem
+  when: not keypem.stat.exists
+- name: Test if csr exists
+  stat:
+    path: /usr/local/etc/acme-tiny/crt.pem
+  register: csrpem
+- name: Create csr
+  shell: |
+    umask 0027
+    openssl req -new -sha256 -key /usr/local/etc/acme-tiny/key.pem -subj "/" -addext "subjectAltName = DNS:{{ http_server_name }}, DNS:{{ http_server_alias }}" > /usr/local/etc/acme-tiny/req.pem
+  when: not csrpem.stat.exists
+- name: Test if crt exists
+  stat:
+    path: /usr/local/etc/acme-tiny/crt.pem
+  register: csrpem
+- name: Test if certificate exists
+  stat:
+    path: /usr/local/etc/acme-tiny/crt.pem
+  register: crtpem
+- name: Self-sign initial csr
+  shell: |
+    umask 0027
+    openssl req -new -x509 -key /usr/local/etc/acme-tiny/key.pem -days 1 -sha256 -subj "/CN=REPLACEME" -out /usr/local/etc/acme-tiny/crt.pem
+  when: not crtpem.stat.exists
+- name: Install Service Unit
+  copy:
+    src: acme-tiny.service
+    dest: /etc/systemd/system/acme-tiny.service
+- name: Install Timer Unit
+  copy:
+    src: acme-tiny.timer
+    dest: /etc/systemd/system/acme-tiny.timer
+- name: Enable ACME-Tiny timer
+  systemd_service:
+    name: acme-tiny.timer
+    state: started
+    enabled: true
+    daemon_reload: true
+
+# vim: filetype=yaml

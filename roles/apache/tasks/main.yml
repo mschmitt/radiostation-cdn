@@ -9,7 +9,6 @@
 - name: Enable all the things
   shell: |
     a2enmod ssl || true
-    a2enmod md || true
     a2enmod proxy || true
     a2enmod proxy_http || true
     a2enmod headers || true
@@ -17,4 +16,8 @@
     a2ensite default-ssl || true
     systemctl stop apache2 || true
     systemctl start apache2
+- name: Create the ACME challenge directory
+  file:
+    path: /var/www/html/.well-known/acme-challenge
+    state: directory
 # vim: filetype=yaml

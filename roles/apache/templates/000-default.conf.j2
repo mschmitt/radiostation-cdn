@@ -1,4 +1,6 @@
 # This file deployed by ansible. Do not edit.
+ServerSignature Off
+ServerTokens Prod
 <VirtualHost *:80>
 	ServerName {{ http_server_name }}
 	ServerAlias {{ http_server_alias }}
