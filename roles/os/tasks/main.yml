@@ -21,6 +21,7 @@
       - bash-completion
       - man-db
       - python-is-python3
+      - cron
 - name: Clone prometheus icecast exporter
   git:
     repo: https://github.com/ethrgeist/icecast_exporter
