@@ -2,7 +2,7 @@
 Description=ACME-Tiny (timer)
 
 [Timer]
-OnCalendar=daily
+OnCalendar=monthly
 
 [Install]
 WantedBy=timers.target

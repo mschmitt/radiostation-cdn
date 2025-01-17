@@ -4,5 +4,6 @@ Description=ACME-Tiny (service)
 [Service]
 Type=oneshot
 WorkingDirectory=/usr/local/etc/acme-tiny/
-ExecStart=sh -c 'python /usr/local/src/acme-tiny/acme_tiny.py --account-key account.key --csr req.pem --acme-dir /var/www/html/.well-known/acme-challenge/ > crt.pem'
+ExecStart=sh -c 'python /usr/local/src/acme-tiny/acme_tiny.py --account-key account.key --csr req.pem --acme-dir /var/www/html/.well-known/acme-challenge/ > crtnew.pem'
+ExecStartPost=mv crtnew.pem crt.pem
 ExecStartPost=apachectl graceful
