@@ -92,7 +92,7 @@
 - name: Enable and start icecast-relayproxy
   systemd:
     name: icecast-relayproxy
-    state: started
+    state: restarted
     enabled: true
     daemon_reload: true
 
