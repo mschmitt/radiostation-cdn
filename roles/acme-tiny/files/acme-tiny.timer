@@ -2,7 +2,10 @@
 Description=ACME-Tiny (timer)
 
 [Timer]
-OnCalendar=monthly
+# On the 1st and 16th of each month
+OnCalendar=*-*-1,16
+RandomizedDelaySec=24h
+Persistent=true
 
 [Install]
 WantedBy=timers.target
